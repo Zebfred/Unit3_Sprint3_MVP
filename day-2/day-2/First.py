@@ -1,16 +1,17 @@
 from flask import Flask, render_template, request
-from flask_sqlachemy import SQLAlchemy
 import requests 
+from flask_sqlalchemy import SQLAlchemy
 
 #Global variable
 APP = Flask(__name__)
 FLASK_ENV = "development"
 
-APP.config['SQLAlchemy_DATABASE_URI'] = 'sqlite:///db.sqlite3'
+APP.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
 
-DB = SQ
+DB = SQLAlchemy(APP)
 
-@APP.route("/", methods = ["POST", "GET"])
+
+@APP.route("/", methods=["POST", "GET"])
 
 #function
 
@@ -47,35 +48,33 @@ def listBreeds():
                 breeds.append(full)
     return breeds
 
-@APP.route('/favorites', methods= ['POST'])
-def favorites():
-    faves= Dog.query.with_entirities
-    faves=faves 
-
-@APP.route('/saved',methods = ["POST"])
+@APP.route('/saved', methods = ["POST"])
 def saved():
-    dog_url = request.values["URL"]
-    breed = dog_url.split('/')[4]
+    dog = request.values['URL']
+    breed = dog.split('/')[4]
     DB.session.add(Dog(url=dog, breed=breed))
     DB.session.commit()
-    return render_template('home.html', picture= randomImage())
+    return render_template('home.html', picture=randomImage())
+
+@APP.route('/favorites')
+def favorites():
+    faves = Dog.query.with_entities(Dog.url)
+    return render_template('faves.html', faves=faves)
 
 @APP.route('/reset')
-
 
 def reset():
     DB.drop_all()
     DB.create_all()
     return "DB reset"
 
-
 class Dog(DB.Model):
-    
-    id = DB.Column(DB.Integer,primary_key=True)
-    url= DB.Column(DB.String(100))
+
+    id = DB.Column(DB.Integer, primary_key=True)
+    url = DB.Column(DB.String(100))
     breed = DB.Column(DB.String(50))
-    
-    
+
+
 
 if __name__ == "__main__":
     APP.run()
